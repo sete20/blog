@@ -15,6 +15,6 @@ class UserController extends Controller
      */
     public function __invoke()
     {
-        return response()->json(['authenticated-user' => auth()->user()], 200);
+        return response()->json(['authenticated-user' => auth()->user()->load('roles')], 200);
     }
 }

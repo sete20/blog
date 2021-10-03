@@ -17,10 +17,9 @@ class RegisterController extends Controller
      */
     public function __invoke(RegisterRequest $request)
     {
-
         $user = User::create($request->allWithHashedPassword());
+        $user->attachRole('user');
         $access_token = $user->createToken('token');
-        //return the access token we generated in the above step
         return response()->json(['token' => $access_token, 'status' => 200]);
     }
 }

@@ -20,7 +20,7 @@
                     <p style=" white-space: wrap;
   overflow: hidden;
   text-overflow: ellipsis;">
-              
+
                 {{ post.body }}
               </p>
             <ul class="list-inline list-unstyled d-flex post-info">
@@ -57,7 +57,7 @@
                 <router-link :to="'/post/'+post.slug">{{post.title}}</router-link>
             </h4>
               <p style="overflow: hidden;">
-              
+
                 {{ post.body }}
               </p>
 
@@ -130,7 +130,7 @@ import Categories from './Categories.vue';
                     this.isSearching = true;
                axios.get('api/search/posts/'+q).then(res=>{
                     this.posts = res.data.posts;
-                    console.log(res.data.posts.length);
+                    console.log(res.data.posts);
                     if(res.data.length > 0){
                 this.isSearching = false;
                     let oldPosts =JSON.parse(localStorage.getItem('posts'));
@@ -138,7 +138,7 @@ import Categories from './Categories.vue';
                     }
                }).then(err=>{
                    console.log(err);
-               });       
+               });
                 }
             }
         },
@@ -147,6 +147,7 @@ import Categories from './Categories.vue';
                axios.get('/api/posts?page=' + page)
                 .then(res=>{
                     this.posts =res.data.posts;
+                    console.log(res.data);
                     this.categories= res.data.categories;
                     localStorage.setItem('posts',JSON.stringify(this.posts));
                     }

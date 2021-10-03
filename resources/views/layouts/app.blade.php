@@ -2,17 +2,18 @@
     <div id="app">
         <nav class="bg-white shadow-sm navbar navbar-expand-md navbar-light">
             <div class="container">
-                @include('layouts.nav')
-@include('layouts.footer')
 
+                
             </div>
         </nav>
-
+        
         <main class="py-4">
             @yield('content')
         </main>
+        @include('layouts.footer')
     </div>
-   <script src="{{ asset('js/app.js') }}"defer></script>
+    
+    <script src="{{ asset('js/app.js') }}"defer></script>
     <script src="assets/js/jquery.min.js"></script>
   <script src="assets/js/bootstrap.bundle.min.js"></script>
 <script>

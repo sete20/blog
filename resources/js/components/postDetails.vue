@@ -23,17 +23,15 @@
 
         <!-- Date/Time -->
         <p>Posted on <strong class="p-1 badge badge-primary">{{ post.added_at }}</strong> at <strong class="p-1 badge badge-danger"> 12:00 PM</strong>
-            <span class="float-right"><strong class="p-1 badge badge-info">22</strong> comments</span></p>
+            <span class="float-right"><strong class="p-1 badge badge-info">{{ comments.length }}</strong> comments</span></p>
 
         <hr>
 
         <!-- Preview Image -->
-        <div v-if="post.posters.length  !== 0">
+        <div v-if="post.posters.length  != 0">
                <img class="mr-3" v-for="poster in post.posters" :key="poster.id" :src="poster.path" alt="Generic placeholder image">
         </div>
           <img class="m-10" v-else src="img/posts/defulat.png" alt="Generic placeholder image">
-
-          <img class="m-10" src="img/posts/defulat.png" alt="Generic placeholder image">
 
         <hr>
 
@@ -42,43 +40,40 @@
         <hr>
 
         <!-- Comments Form -->
-        <div class="my-4 card">
+        <div class="my-4 card" v-if="isLogged">
           <h5 class="card-header">Leave a Comment:</h5>
           <div class="card-body">
             <form>
               <div class="form-group">
-                <textarea class="form-control" rows="3"></textarea>
+                <textarea v-model="body" class="form-control" rows="2"></textarea>
               </div>
-              <button type="submit" class="btn btn-primary">Submit</button>
+              <button type="submit"  @click.prevent="createComment" class="btn btn-primary">Submit</button>
             </form>
           </div>
         </div>
 
         <!-- Single Comment -->
-      <div class="mb-4 media" v-for="(comment,i) in post.comments" :key="i">
-          <img class="mr-3 d-flex rounded-circle" :src="'/img/'+comment.user.profile_img" style="height:50px;width:50px" alt="">
+      <div class="mb-4 media" v-for="comment in comments" :key="comment.id">
+                   <img class="m-10"  src="http://placehold.it/50x50" alt="Generic placeholder image">
           <div class="media-body">
-            <h5 class="mt-0"><strong>{{comment.user.name}}</strong></h5>
-            {{comment.body}}
+            <h5 class="mt-0">
+            {{ comment.user.first_name }}
+            </h5>
+            <strong>{{comment.body}}</strong>
+
 
 
         <!-- Comment with nested comments -->
 
-            <div class="mt-4 media">
-              <img class="mr-3 d-flex rounded-circle" src="http://placehold.it/50x50" alt="">
+            <div class="mt-4 media" v-for="replay in comment.replays" :key="replay.id">
+              <img class="mr-3 d-flex rounded-circle" id="personal_image" src="http://placehold.it/50x50" alt="">
               <div class="media-body">
-                <h5 class="mt-0">Commenter Name</h5>
-                Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+                <h5 class="mt-0">{{ replay.user.first_name }}</h5>
+                {{ replay.body }}
               </div>
             </div>
 
-            <div class="mt-4 media">
-              <img class="mr-3 d-flex rounded-circle" src="http://placehold.it/50x50" alt="">
-              <div class="media-body">
-                <h5 class="mt-0">Commenter Name</h5>
-                Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-              </div>
-            </div>
+
 
           </div>
         </div>
@@ -120,25 +115,60 @@ import Categories from './Categories.vue';
     export default {
   components: { Categories },
         mounted() {
-            console.log('in details')
+            console.log('in details');
             this.getPost();
-            console.log(this.post);
-
+        },
+        created() {
+          this.updateToken();
         },
         data(){
-          return{  post:'',categories:[]}
+          return{
+                post:'',
+                categories:[],
+                body:"",
+                post_id:null,
+                comments:[],
+                }
         },
         methods: {
-           getPost(){
-               axios.get('api/posts/'+this.$route.params.slug).then(res=>{
+            getPost(){
+               axios.get('api/posts/'+this.$route.params.slug).
+               then(res=>{
                    this.post=res.data.post;
                    this.categories=res.data.categories;
-                   console.log(this.post);
+                    this.post_id= this.post.id;
+                    this.comments = this.post.comments;
+                    })
+                .then(err=>{
+                console.log(err);
+                });
+           },
+            createComment(){
+                let{post_id,body}= this;
+                axios.post('api/comment',{body,post_id})
+                .then(res=>{
+                    // console.log(res.data.comment);
+                  this.comments.unshift(res.data);
 
-                }).then(err=>{
-                   console.log(err);
-               });
-           }
+                }).catch(err=>{
+
+                });
         },
+        updateToken(){
+          let token = JSON.parse(localStorage.getItem('userToken'));
+        //   لمنادات الميتوشن وعملها commit
+          this.$store.commit('setUserToken',token);
+        }
+        },
+        computed:{
+            isLogged(){
+                return this.$store.getters.isLogged;
+            }
+        }
+
     }
+
 </script>
+<style scoped>
+#personal_image{height:50px;width:50px;border-radius:50px}
+</style>

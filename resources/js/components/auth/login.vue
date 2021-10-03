@@ -25,8 +25,8 @@
               ... password invalid
               </div>
               <div class="form-group">
-                  <button type="submit" 
-                  @click.prevent="Login" 
+                  <button type="submit"
+                  @click.prevent="Login"
                   :disabled="!isValidForm"
                   class="btn btn-primary btn-block">Log in</button>
               </div>
@@ -64,6 +64,7 @@ export default({
              return this.password.length > 5 && (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(this.email))
          }
         },methods: {
+
           Login(){
             let{email,password} = this;
             this.$store.dispatch('loginUser',{email,password});

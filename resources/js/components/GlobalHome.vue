@@ -1,6 +1,8 @@
 <template>
+<div>
+<navbar></navbar>
 <router-view></router-view>
-
+</div>
 </template>
 
 <script>
@@ -14,8 +16,9 @@ import axios from "axios";
             }
         },
         mounted() {
-            console.log("i'm a home component")
             this.getPosts();
+        },created() {
+            this.updateToken();
         },
         methods: {
             getPosts(){
@@ -26,8 +29,17 @@ import axios from "axios";
                     }
                     ).
                 then(err=>console.log(err))
-            }
+            },
+                   updateToken(){
+            let token = JSON.parse(localStorage.getItem('userToken'));
+            this.$store.commit('setUserToken',token);
         },
+        },computed:{
+            isLogged(){
+                return this.$store.getters.isLogged;
+            }
+        }
+ 
 
     }
 </script>

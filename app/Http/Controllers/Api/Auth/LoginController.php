@@ -22,8 +22,11 @@ class LoginController extends Controller
         if (auth()->attempt($login_credentials)) {
             //generate the token for the user
             $user_login_token = auth()->user()->createToken('token');
+            $user = auth()->user();
             //now return this token on success login attempt
-            return response()->json(['token' => $user_login_token], 200);
+            return response()->json([
+                'token' => $user_login_token, 200,
+            ]);
         } else {
             //wrong login credentials, return, user not authorised to our system, return error code 401
             return response()->json(['error' => 'UnAuthorised Access'], 401);

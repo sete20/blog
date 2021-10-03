@@ -49,7 +49,8 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-
+        $post->load('comments');
+        $post->comments->load('replays');
         return response()->json(
             [
                 'post' => [
@@ -58,12 +59,28 @@ class PostController extends Controller
                     'body' => $post->body,
                     'added_at' => $post->created_at->diffForHumans(),
                     'posters' => $post->photos,
-                    'user' => $post->user,
+                    'user' => $post->user->name,
                     'title' => $post->title,
                     'comments_count' => $post->comments->count(),
                     'categories' => $post->categories,
                     // count($post->comments) != 0 ??
-                    'comments' => $this->commentFormatted($post->comments),
+                    'comments' => $post->comments->map(function ($comment) {
+                        return [
+                            'id' => $comment->id,
+                            'body' => $comment->body,
+                            'user' => $comment->user,
+                            'added_at' => $comment->created_at->diffForHumans(),
+                            'profile_img' => $comment->user->profile_image->latest()->first()->path,
+                            'replays' => $comment->replays->map(function ($replay) {
+                                return [
+                                    'profile_img' => $replay->user->profile_image->latest()->first()->path,
+                                    'user' => $replay->user,
+                                    'email' => $replay->user->email,
+                                    'body' => $replay->body,
+                                ];
+                            }),
+                        ];
+                    }),
                 ], 'categories' => Category::get()
 
             ]
@@ -74,7 +91,8 @@ class PostController extends Controller
     {
         $newComments = [];
         foreach ($comments as $comment) {
-            array_push($newComments, [
+            return  array_push($newComments, [
+                'profile_img' => $comment->user->profile_img,
                 'id' => $comment->id,
                 'body' => $comment->body,
                 'created_at' => $comment->created_at->diffForHumans(),
@@ -82,6 +100,7 @@ class PostController extends Controller
 
             ]);
         }
+        dd($newComments);
     }
 
     /**
