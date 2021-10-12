@@ -10,9 +10,9 @@
 					<div class="col-sm-6">
 						<a href="#addPostModal" class="btn btn-success" data-toggle="modal"><i class="material-icons">&#xE147;</i> <span>Add New Post</span></a>
 
-						<a href="#deletePostModal" 
+						<a href="#deletePostModal"
 						class="btn btn-danger" data-toggle="modal"><i class="material-icons">&#xE15C;</i> <span>Delete</span></a>
-						<a href="#deletePostModalnopost" 
+						<a href="#deletePostModalnopost"
 						class="btn btn-danger" data-toggle="modal"><i class="material-icons">&#xE15C;</i> <span>Delete</span></a>
 					</div>
                 </div>
@@ -35,29 +35,33 @@
                         <th>Action</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
+                <tbody v-if="posts.data">
+                    <tr v-for="(post,index) in posts.data" :key="index">
 						<td>
 							<span class="custom-checkbox">
 								<input type="checkbox"
 								name="options[]" value="1">
-								<label ></label></label>
+								<label ></label>
 							</span>
 						</td>
-                        <td></td>
-                        <td></td>
+                        <td>{{ post.title }}</td>
+                        <td>{{ post.body.substr(0,150) }}</td>
 						<td>
-                            <span class="p-1 mb-1 badge badge-info"></span>
+                            <span class="p-1 mb-1 badge badge-info" v-for="category in post.categories" :key="category.id">
+                            <span>{{ category.name }}</span>
+                            </span>
                         </td>
                         <td>
-                            <img src="" style="width:100px;height:60px;border:1px solid #e7e7e7" alt="">
+                            <img  v-if="post.poster" :src="fdfd" style="width:100px;height:60px;border:1px solid #e7e7e7" alt="">
+                            <img class="mr-3" v-else src="img/posts/defulat.png" alt="Generic placeholder image">
+
                         </td>
-                        <td></td>
-                        <td>
-                            <a href="#editPostModal" class="edit" 
+                        <td>{{post.user.first_name +' '+ post.user.last_name}}</td>
+                   <td>
+                            <a href="#editPostModal" class="edit"
 							 data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
                             <a href="#deletePostModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>
-                            <a  target="_blank"><i class="material-icons" data-toggle="tooltip" title="Delete">&#128065;</i></a>
+                            <router-link  :to="'/post/'+post.slug" class="" target="_blank"><i class="material-icons" data-toggle="tooltip" title="Delete">&#128065;</i></router-link>
                         </td>
                     </tr>
 
@@ -65,8 +69,9 @@
                 </tbody>
             </table>
 			<div class="clearfix">
-                <div class="hint-text">Showing <b>5</b> out of <b>25</b> entries</div>
-               
+                         <div class="hint-text">Showing <b>10</b> out of <b>{{posts.total}}</b> entries</div>
+                <pagination :data="posts" @pagination-change-page="getPosts"></pagination>
+
             </div>
         </div>
     </div>
@@ -82,36 +87,37 @@
 					<div class="modal-body">
 						<div class="form-group">
 							<label>title</label>
-							<input type="text" class="form-control" required>
+							<input type="text" class="form-control" required v-model="title">
 						</div>
 						<div class="form-group">
 							<label>body</label>
-							<textarea name=""  cols="30" class="form-control" rows="10"></textarea>
+							<textarea name=""  cols="30" class="form-control" rows="10" v-model="body"></textarea>
 						</div>
 						<div class="form-group">
 							<label>category</label>
-							<select name="" class="form-control">
+							<select name="" class="form-control" multiple="multiple" @change="pushCategories">
                                 <option value="0" disabled selected>choose category</option>
 
-                                <option>
-							
+                                <option v-for="category in categories" :key="category.id"  :value="category.id">
+                                        {{ category.name }}
 								</option>
                             </select>
 						</div>
 						<div class="form-group">
-							<label>image</label>
-							<input type="file" class="form-control" required>
+							<label>images</label>
+														<input type="file" class="form-control" multiple="multiple" required @change="onImageChanged" >
+
 						</div>
 					</div>
 					<div class="modal-footer">
 						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-						<input type="submit" class="btn btn-success" value="Add" >
+						<input type="submit" class="btn btn-success" value="Add" @click.prevent="addPost">
 					</div>
 				</form>
 			</div>
 		</div>
 	</div>
-   <editpost></editpost>
+   <EditPost></EditPost>
 	<!-- Delete Modal HTML -->
 	<div id="deletePostModal" class="modal fade">
 		<div class="modal-dialog">
@@ -124,11 +130,11 @@
 					<div class="modal-body">
 						<p>Are you sure you want to delete these Records?</p>
 						<p class="text-warning"><small>This action cannot be undone.</small></p>
-						<p class="text-warning"><small>Selected Posts : <strong></strong></small></p>
+						<p class="text-warning"><small>Selected Posts :  <strong></strong></small></p>
 					</div>
 					<div class="modal-footer">
 						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-						<input type="submit" class="btn btn-danger" 
+						<input type="submit" class="btn btn-danger"
 						value="Delete">
 					</div>
 				</form>
@@ -155,9 +161,81 @@
 </div>
 </template>
 <script>
-import editPost from './EditPost'
+import EditPost from './EditPost.vue'
 export default{
+    mounted() {
+        this.getPosts();
+    },
+    	components:{
+          EditPost
+	},
+    data() {
+        return {
+            images:[],
+            categories:[],
+            title:'',
+            body:'',
+            posts:{},
+            categoriesPost:[],
+        }
 
+    },
+       methods: {
+           pushCategories(event){
+            //    console.log(event.target.options.selectedIndex);
+               this.categoriesPost.push(event.target.options.selectedIndex);
+    console.log(this.categoriesPost);
+           },
+            getPosts(page){
+                       axios.get('api/dashboard/posts/?page='+page).then(res=>{
+               this.posts = res.data.posts;
+               this.categories = res.data.categories;
+               console.log(this.categories);
+               console.log(this.posts);
+            }).then(err=>{
+                   console.log(err);
+
+            });
+            },
+
+            	onImageChanged(event){
+            //         this.images = [];
+            //  var files =event.target.files;
+                //   Array.from(event.target.files).forEach((file) => this.images(file));
+
+                console.log(this.images);
+                    for (var i = 0; i < event.target.files.length; i++) {
+
+                    // get item
+                    this.images =event.target.files.item(i);
+
+                }
+            //     Object.entries(this.images);
+			console.log(this.images)
+            // this.image= [];
+
+			//console.log(event.target.files[0])
+			// this.image  = event.target.files[0]
+
+            //   = event.target.files
+		},
+        addPost(){
+       		let config ={
+				headers :{"content-type" : 'multipart/form-data'}
+			}
+          		let formdata = new FormData();
+            formdata.append('title',this.title)
+            formdata.append('body',this.body)
+            formdata.append('images',this.images)
+            formdata.append('categories',this.categoriesPost);
+            axios.post('api/dashboard/posts',formdata,config).then(res=>{
+                  console.log(res);
+            }).then(err=>{
+
+            });
+
+        },
+        },
 }
     $(document).ready(function() {
             // Activate tooltip
@@ -190,7 +268,7 @@ export default{
             font-family: 'Varela Round', sans-serif;
             font-size: 13px;
         }
-        
+
         .table-wrapper {
             background: #fff;
             padding: 20px 25px;
@@ -198,7 +276,7 @@ export default{
             border-radius: 3px;
             box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
         }
-        
+
         .table-title {
             padding-bottom: 15px;
             background: #435d7d;
@@ -207,16 +285,16 @@ export default{
             margin: -20px -25px 10px;
             border-radius: 3px 3px 0 0;
         }
-        
+
         .table-title h2 {
             margin: 5px 0 0;
             font-size: 24px;
         }
-        
+
         .table-title .btn-group {
             float: right;
         }
-        
+
         .table-title .btn {
             color: #fff;
             float: right;
@@ -228,53 +306,53 @@ export default{
             outline: none !important;
             margin-left: 10px;
         }
-        
+
         .table-title .btn i {
             float: left;
             font-size: 21px;
             margin-right: 5px;
         }
-        
+
         .table-title .btn span {
             float: left;
             margin-top: 2px;
         }
-        
+
         table.table tr th,
         table.table tr td {
             border-color: #e9e9e9;
             padding: 12px 15px;
             vertical-align: middle;
         }
-        
+
         table.table tr th:first-child {
             width: 60px;
         }
-        
+
         table.table tr th:last-child {
             width: 100px;
         }
-        
+
         table.table-striped tbody tr:nth-of-type(odd) {
             background-color: #fcfcfc;
         }
-        
+
         table.table-striped.table-hover tbody tr:hover {
             background: #f5f5f5;
         }
-        
+
         table.table th i {
             font-size: 13px;
             margin: 0 5px;
             cursor: pointer;
         }
-        
+
         table.table td:last-child i {
             opacity: 0.9;
             font-size: 22px;
             margin: 0 5px;
         }
-        
+
         table.table td a {
             font-weight: bold;
             color: #566787;
@@ -282,34 +360,34 @@ export default{
             text-decoration: none;
             outline: none !important;
         }
-        
+
         table.table td a:hover {
             color: #2196F3;
         }
-        
+
         table.table td a.edit {
             color: #FFC107;
         }
-        
+
         table.table td a.delete {
             color: #F44336;
         }
-        
+
         table.table td i {
             font-size: 19px;
         }
-        
+
         table.table .avatar {
             border-radius: 50%;
             vertical-align: middle;
             margin-right: 10px;
         }
-        
+
         .pagination {
             float: right;
             margin: 0 0 5px;
         }
-        
+
         .pagination li a {
             border: none;
             font-size: 13px;
@@ -322,29 +400,29 @@ export default{
             text-align: center;
             padding: 0 6px;
         }
-        
+
         .pagination li a:hover {
             color: #666;
         }
-        
+
         .pagination li.active a,
         .pagination li.active a.page-link {
             background: #03A9F4;
         }
-        
+
         .pagination li.active a:hover {
             background: #0397d6;
         }
-        
+
         .pagination li.disabled i {
             color: #ccc;
         }
-        
+
         .pagination li i {
             font-size: 16px;
             padding-top: 6px
         }
-        
+
         .hint-text {
             float: left;
             margin-top: 10px;
@@ -352,23 +430,23 @@ export default{
         }
         /* Custom
     checkbox */
-        
+
         .custom-checkbox {
             position: relative;
         }
-        
+
         .custom-checkbox input[type="checkbox"] {
             opacity: 0;
             position: absolute;
             margin: 5px 0 0 3px;
             z-index: 9;
         }
-        
+
         .custom-checkbox label:before {
             width: 18px;
             height: 18px;
         }
-        
+
         .custom-checkbox label:before {
             content: '';
             margin-right: 10px;
@@ -380,7 +458,7 @@ export default{
             box-sizing: border-box;
             z-index: 2;
         }
-        
+
         .custom-checkbox input[type="checkbox"]:checked+label:after {
             content: '';
             position: absolute;
@@ -394,16 +472,16 @@ export default{
             z-index: 3;
             transform: rotateZ(45deg);
         }
-        
+
         .custom-checkbox input[type="checkbox"]:checked+label:before {
             border-color: #03A9F4;
             background: #03A9F4;
         }
-        
+
         .custom-checkbox input[type="checkbox"]:checked+label:after {
             border-color: #fff;
         }
-        
+
         .custom-checkbox input[type="checkbox"]:disabled+label:before {
             color: #b8b8b8;
             cursor: auto;
@@ -411,45 +489,45 @@ export default{
             background: #ddd;
         }
         /* Modal styles */
-        
+
         .modal .modal-dialog {
             max-width: 400px;
         }
-        
+
         .modal .modal-header,
         .modal .modal-body,
         .modal .modal-footer {
             padding: 20px 30px;
         }
-        
+
         .modal .modal-content {
             border-radius: 3px;
         }
-        
+
         .modal .modal-footer {
             background: #ecf0f1;
             border-radius: 0 0 3px 3px;
         }
-        
+
         .modal .modal-title {
             display: inline-block;
         }
-        
+
         .modal .form-control {
             border-radius: 2px;
             box-shadow: none;
             border-color: #dddddd;
         }
-        
+
         .modal textarea.form-control {
             resize: vertical;
         }
-        
+
         .modal .btn {
             border-radius: 2px;
             min-width: 100px;
         }
-        
+
         .modal form label {
             font-weight: normal;
         }

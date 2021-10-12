@@ -15,9 +15,9 @@ class DatabaseSeeder extends Seeder
     {
         // \App\Models\User::factory(10)->create();
         $this->call([
-            // CategorySeeder::class,
-            // PostSeeder::class,
-            // CommentSeeder::class,
+            CategorySeeder::class,
+            PostSeeder::class,
+            CommentSeeder::class,
             LaratrustSeeder::class,
             UserSeeder::class,
         ]);

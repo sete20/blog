@@ -2729,7 +2729,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _EditPost__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./EditPost */ "./resources/js/components/dashboard/EditPost.vue");
+/* harmony import */ var _EditPost_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./EditPost.vue */ "./resources/js/components/dashboard/EditPost.vue");
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2887,7 +2893,75 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({});
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  mounted: function mounted() {
+    this.getPosts();
+  },
+  components: {
+    EditPost: _EditPost_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
+  },
+  data: function data() {
+    return {
+      images: [],
+      categories: [],
+      title: '',
+      body: '',
+      posts: {},
+      categoriesPost: []
+    };
+  },
+  methods: {
+    pushCategories: function pushCategories(event) {
+      //    console.log(event.target.options.selectedIndex);
+      this.categoriesPost.push(event.target.options.selectedIndex);
+      console.log(this.categoriesPost);
+    },
+    getPosts: function getPosts(page) {
+      var _this = this;
+
+      axios.get('api/dashboard/posts/?page=' + page).then(function (res) {
+        _this.posts = res.data.posts;
+        _this.categories = res.data.categories;
+        console.log(_this.categories);
+        console.log(_this.posts);
+      }).then(function (err) {
+        console.log(err);
+      });
+    },
+    onImageChanged: function onImageChanged(event) {
+      //         this.images = [];
+      //  var files =event.target.files;
+      //   Array.from(event.target.files).forEach((file) => this.images(file));
+      console.log(this.images);
+
+      for (var i = 0; i < event.target.files.length; i++) {
+        // get item
+        this.images = event.target.files.item(i);
+      } //     Object.entries(this.images);
+
+
+      console.log(this.images); // this.image= [];
+      //console.log(event.target.files[0])
+      // this.image  = event.target.files[0]
+      //   = event.target.files
+    },
+    addPost: function addPost() {
+      var config = {
+        headers: {
+          "content-type": 'multipart/form-data'
+        }
+      };
+      var formdata = new FormData();
+      formdata.append('title', this.title);
+      formdata.append('body', this.body);
+      formdata.append('images', this.images);
+      formdata.append('categories', this.categoriesPost);
+      axios.post('api/dashboard/posts', formdata, config).then(function (res) {
+        console.log(res);
+      }).then(function (err) {});
+    }
+  }
+});
 $(document).ready(function () {
   // Activate tooltip
   $('[data-toggle="tooltip"]').tooltip(); // Select/Deselect checkboxes
@@ -3216,6 +3290,7 @@ Vue.component('category_posts', __webpack_require__(/*! ./components/category_po
 Vue.component('pagination', __webpack_require__(/*! laravel-vue-pagination */ "./node_modules/laravel-vue-pagination/dist/laravel-vue-pagination.common.js"));
 Vue.component('login', __webpack_require__(/*! ./components/auth/login.vue */ "./resources/js/components/auth/login.vue")["default"]);
 Vue.component('register', __webpack_require__(/*! ./components/auth/register.vue */ "./resources/js/components/auth/register.vue")["default"]);
+Vue.component('EditPost', __webpack_require__(/*! ./components/dashboard/EditPost.vue */ "./resources/js/components/dashboard/EditPost.vue")["default"]);
 Vue.component('navbar', __webpack_require__(/*! ./components/layouts/nav.vue */ "./resources/js/components/layouts/nav.vue")["default"]);
 Vue.component('dashboard', __webpack_require__(/*! ./components/dashboard/home.vue */ "./resources/js/components/dashboard/home.vue")["default"]);
 /**
@@ -7871,7 +7946,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n#personal_image[data-v-1e60a0f2]{height:50px;width:50px;border-radius:50px}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n#personal_image[data-v-1e60a0f2]{height:50px;width:50px;border-radius:50px}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -41816,235 +41891,157 @@ var render = function() {
     "div",
     { attrs: { id: "cont" } },
     [
-      _vm._m(0),
-      _vm._v(" "),
-      _vm._m(1),
-      _vm._v(" "),
-      _c("editpost"),
-      _vm._v(" "),
-      _vm._m(2),
-      _vm._v(" "),
-      _vm._m(3)
-    ],
-    1
-  )
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", {}, [
-      _c("div", { staticClass: "table-wrapper" }, [
-        _c("div", { staticClass: "table-title" }, [
-          _c("div", { staticClass: "row" }, [
-            _c("div", { staticClass: "col-sm-6" }, [
-              _c("h2", [_vm._v("Manage "), _c("b", [_vm._v("Posts")])])
-            ]),
+      _c("div", {}, [
+        _c("div", { staticClass: "table-wrapper" }, [
+          _vm._m(0),
+          _vm._v(" "),
+          _c("table", { staticClass: "table table-striped table-hover" }, [
+            _vm._m(1),
             _vm._v(" "),
-            _c("div", { staticClass: "col-sm-6" }, [
-              _c(
-                "a",
-                {
-                  staticClass: "btn btn-success",
-                  attrs: { href: "#addPostModal", "data-toggle": "modal" }
-                },
-                [
-                  _c("i", { staticClass: "material-icons" }, [_vm._v("")]),
-                  _vm._v(" "),
-                  _c("span", [_vm._v("Add New Post")])
-                ]
-              ),
-              _vm._v(" "),
-              _c(
-                "a",
-                {
-                  staticClass: "btn btn-danger",
-                  attrs: { href: "#deletePostModal", "data-toggle": "modal" }
-                },
-                [
-                  _c("i", { staticClass: "material-icons" }, [_vm._v("")]),
-                  _vm._v(" "),
-                  _c("span", [_vm._v("Delete")])
-                ]
-              ),
-              _vm._v(" "),
-              _c(
-                "a",
-                {
-                  staticClass: "btn btn-danger",
-                  attrs: {
-                    href: "#deletePostModalnopost",
-                    "data-toggle": "modal"
-                  }
-                },
-                [
-                  _c("i", { staticClass: "material-icons" }, [_vm._v("")]),
-                  _vm._v(" "),
-                  _c("span", [_vm._v("Delete")])
-                ]
-              )
-            ])
-          ])
-        ]),
-        _vm._v(" "),
-        _c("table", { staticClass: "table table-striped table-hover" }, [
-          _c("thead", [
-            _c("tr", [
-              _c("th", [
-                _c("span", { staticClass: "custom-checkbox" }, [
-                  _c("input", { attrs: { type: "checkbox", id: "selectAll" } }),
-                  _vm._v(" "),
-                  _c("label", { attrs: { for: "selectAll" } })
-                ])
-              ]),
-              _vm._v(" "),
-              _c("th", [_vm._v("Title")]),
-              _vm._v(" "),
-              _c("th", [_vm._v("Body")]),
-              _vm._v(" "),
-              _c("th", [_vm._v("Category")]),
-              _vm._v(" "),
-              _c("th", [_vm._v("Image")]),
-              _vm._v(" "),
-              _c("th", [_vm._v("User")]),
-              _vm._v(" "),
-              _c("th", [_vm._v("Action")])
-            ])
+            _vm.posts.data
+              ? _c(
+                  "tbody",
+                  _vm._l(_vm.posts.data, function(post, index) {
+                    return _c("tr", { key: index }, [
+                      _vm._m(2, true),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(post.title))]),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(post.body.substr(0, 150)))]),
+                      _vm._v(" "),
+                      _c(
+                        "td",
+                        _vm._l(post.categories, function(category) {
+                          return _c(
+                            "span",
+                            {
+                              key: category.id,
+                              staticClass: "p-1 mb-1 badge badge-info"
+                            },
+                            [_c("span", [_vm._v(_vm._s(category.name))])]
+                          )
+                        }),
+                        0
+                      ),
+                      _vm._v(" "),
+                      _c("td", [
+                        post.poster
+                          ? _c("img", {
+                              staticStyle: {
+                                width: "100px",
+                                height: "60px",
+                                border: "1px solid #e7e7e7"
+                              },
+                              attrs: { src: _vm.fdfd, alt: "" }
+                            })
+                          : _c("img", {
+                              staticClass: "mr-3",
+                              attrs: {
+                                src: "img/posts/defulat.png",
+                                alt: "Generic placeholder image"
+                              }
+                            })
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(
+                            post.user.first_name + " " + post.user.last_name
+                          )
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "td",
+                        [
+                          _vm._m(3, true),
+                          _vm._v(" "),
+                          _vm._m(4, true),
+                          _vm._v(" "),
+                          _c(
+                            "router-link",
+                            {
+                              attrs: {
+                                to: "/post/" + post.slug,
+                                target: "_blank"
+                              }
+                            },
+                            [
+                              _c(
+                                "i",
+                                {
+                                  staticClass: "material-icons",
+                                  attrs: {
+                                    "data-toggle": "tooltip",
+                                    title: "Delete"
+                                  }
+                                },
+                                [_vm._v("👁")]
+                              )
+                            ]
+                          )
+                        ],
+                        1
+                      )
+                    ])
+                  }),
+                  0
+                )
+              : _vm._e()
           ]),
           _vm._v(" "),
-          _c("tbody", [
-            _c("tr", [
-              _c("td", [
-                _c("span", { staticClass: "custom-checkbox" }, [
-                  _c("input", {
-                    attrs: { type: "checkbox", name: "options[]", value: "1" }
-                  }),
-                  _vm._v(" "),
-                  _c("label")
-                ])
+          _c(
+            "div",
+            { staticClass: "clearfix" },
+            [
+              _c("div", { staticClass: "hint-text" }, [
+                _vm._v("Showing "),
+                _c("b", [_vm._v("10")]),
+                _vm._v(" out of "),
+                _c("b", [_vm._v(_vm._s(_vm.posts.total))]),
+                _vm._v(" entries")
               ]),
               _vm._v(" "),
-              _c("td"),
-              _vm._v(" "),
-              _c("td"),
-              _vm._v(" "),
-              _c("td", [
-                _c("span", { staticClass: "p-1 mb-1 badge badge-info" })
-              ]),
-              _vm._v(" "),
-              _c("td", [
-                _c("img", {
-                  staticStyle: {
-                    width: "100px",
-                    height: "60px",
-                    border: "1px solid #e7e7e7"
-                  },
-                  attrs: { src: "", alt: "" }
-                })
-              ]),
-              _vm._v(" "),
-              _c("td"),
-              _vm._v(" "),
-              _c("td", [
-                _c(
-                  "a",
-                  {
-                    staticClass: "edit",
-                    attrs: { href: "#editPostModal", "data-toggle": "modal" }
-                  },
-                  [
-                    _c(
-                      "i",
-                      {
-                        staticClass: "material-icons",
-                        attrs: { "data-toggle": "tooltip", title: "Edit" }
-                      },
-                      [_vm._v("")]
-                    )
-                  ]
-                ),
-                _vm._v(" "),
-                _c(
-                  "a",
-                  {
-                    staticClass: "delete",
-                    attrs: { href: "#deletePostModal", "data-toggle": "modal" }
-                  },
-                  [
-                    _c(
-                      "i",
-                      {
-                        staticClass: "material-icons",
-                        attrs: { "data-toggle": "tooltip", title: "Delete" }
-                      },
-                      [_vm._v("")]
-                    )
-                  ]
-                ),
-                _vm._v(" "),
-                _c("a", { attrs: { target: "_blank" } }, [
-                  _c(
-                    "i",
-                    {
-                      staticClass: "material-icons",
-                      attrs: { "data-toggle": "tooltip", title: "Delete" }
-                    },
-                    [_vm._v("👁")]
-                  )
-                ])
-              ])
-            ])
-          ])
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "clearfix" }, [
-          _c("div", { staticClass: "hint-text" }, [
-            _vm._v("Showing "),
-            _c("b", [_vm._v("5")]),
-            _vm._v(" out of "),
-            _c("b", [_vm._v("25")]),
-            _vm._v(" entries")
-          ])
+              _c("pagination", {
+                attrs: { data: _vm.posts },
+                on: { "pagination-change-page": _vm.getPosts }
+              })
+            ],
+            1
+          )
         ])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c(
-      "div",
-      { staticClass: "modal fade", attrs: { id: "addPostModal" } },
-      [
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "modal fade", attrs: { id: "addPostModal" } }, [
         _c("div", { staticClass: "modal-dialog" }, [
           _c("div", { staticClass: "modal-content" }, [
             _c("form", { attrs: { enctype: "multipart/form-data" } }, [
-              _c("div", { staticClass: "modal-header" }, [
-                _c("h4", { staticClass: "modal-title" }, [_vm._v("Add Post")]),
-                _vm._v(" "),
-                _c(
-                  "button",
-                  {
-                    staticClass: "close",
-                    attrs: {
-                      type: "button",
-                      "data-dismiss": "modal",
-                      "aria-hidden": "true"
-                    }
-                  },
-                  [_vm._v("×")]
-                )
-              ]),
+              _vm._m(5),
               _vm._v(" "),
               _c("div", { staticClass: "modal-body" }, [
                 _c("div", { staticClass: "form-group" }, [
                   _c("label", [_vm._v("title")]),
                   _vm._v(" "),
                   _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.title,
+                        expression: "title"
+                      }
+                    ],
                     staticClass: "form-control",
-                    attrs: { type: "text", required: "" }
+                    attrs: { type: "text", required: "" },
+                    domProps: { value: _vm.title },
+                    on: {
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.title = $event.target.value
+                      }
+                    }
                   })
                 ]),
                 _vm._v(" "),
@@ -42052,8 +42049,25 @@ var staticRenderFns = [
                   _c("label", [_vm._v("body")]),
                   _vm._v(" "),
                   _c("textarea", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.body,
+                        expression: "body"
+                      }
+                    ],
                     staticClass: "form-control",
-                    attrs: { name: "", cols: "30", rows: "10" }
+                    attrs: { name: "", cols: "30", rows: "10" },
+                    domProps: { value: _vm.body },
+                    on: {
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.body = $event.target.value
+                      }
+                    }
                   })
                 ]),
                 _vm._v(" "),
@@ -42062,7 +42076,11 @@ var staticRenderFns = [
                   _vm._v(" "),
                   _c(
                     "select",
-                    { staticClass: "form-control", attrs: { name: "" } },
+                    {
+                      staticClass: "form-control",
+                      attrs: { name: "", multiple: "multiple" },
+                      on: { change: _vm.pushCategories }
+                    },
                     [
                       _c(
                         "option",
@@ -42070,17 +42088,34 @@ var staticRenderFns = [
                         [_vm._v("choose category")]
                       ),
                       _vm._v(" "),
-                      _c("option")
-                    ]
+                      _vm._l(_vm.categories, function(category) {
+                        return _c(
+                          "option",
+                          {
+                            key: category.id,
+                            domProps: { value: category.id }
+                          },
+                          [
+                            _vm._v(
+                              "\n                                        " +
+                                _vm._s(category.name) +
+                                "\n\t\t\t\t\t\t\t\t"
+                            )
+                          ]
+                        )
+                      })
+                    ],
+                    2
                   )
                 ]),
                 _vm._v(" "),
                 _c("div", { staticClass: "form-group" }, [
-                  _c("label", [_vm._v("image")]),
+                  _c("label", [_vm._v("images")]),
                   _vm._v(" "),
                   _c("input", {
                     staticClass: "form-control",
-                    attrs: { type: "file", required: "" }
+                    attrs: { type: "file", multiple: "multiple", required: "" },
+                    on: { change: _vm.onImageChanged }
                   })
                 ])
               ]),
@@ -42097,14 +42132,189 @@ var staticRenderFns = [
                 _vm._v(" "),
                 _c("input", {
                   staticClass: "btn btn-success",
-                  attrs: { type: "submit", value: "Add" }
+                  attrs: { type: "submit", value: "Add" },
+                  on: {
+                    click: function($event) {
+                      $event.preventDefault()
+                      return _vm.addPost.apply(null, arguments)
+                    }
+                  }
                 })
               ])
             ])
           ])
         ])
+      ]),
+      _vm._v(" "),
+      _c("EditPost"),
+      _vm._v(" "),
+      _vm._m(6),
+      _vm._v(" "),
+      _vm._m(7)
+    ],
+    1
+  )
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "table-title" }, [
+      _c("div", { staticClass: "row" }, [
+        _c("div", { staticClass: "col-sm-6" }, [
+          _c("h2", [_vm._v("Manage "), _c("b", [_vm._v("Posts")])])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "col-sm-6" }, [
+          _c(
+            "a",
+            {
+              staticClass: "btn btn-success",
+              attrs: { href: "#addPostModal", "data-toggle": "modal" }
+            },
+            [
+              _c("i", { staticClass: "material-icons" }, [_vm._v("")]),
+              _vm._v(" "),
+              _c("span", [_vm._v("Add New Post")])
+            ]
+          ),
+          _vm._v(" "),
+          _c(
+            "a",
+            {
+              staticClass: "btn btn-danger",
+              attrs: { href: "#deletePostModal", "data-toggle": "modal" }
+            },
+            [
+              _c("i", { staticClass: "material-icons" }, [_vm._v("")]),
+              _vm._v(" "),
+              _c("span", [_vm._v("Delete")])
+            ]
+          ),
+          _vm._v(" "),
+          _c(
+            "a",
+            {
+              staticClass: "btn btn-danger",
+              attrs: { href: "#deletePostModalnopost", "data-toggle": "modal" }
+            },
+            [
+              _c("i", { staticClass: "material-icons" }, [_vm._v("")]),
+              _vm._v(" "),
+              _c("span", [_vm._v("Delete")])
+            ]
+          )
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", [
+          _c("span", { staticClass: "custom-checkbox" }, [
+            _c("input", { attrs: { type: "checkbox", id: "selectAll" } }),
+            _vm._v(" "),
+            _c("label", { attrs: { for: "selectAll" } })
+          ])
+        ]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Title")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Body")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Category")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Image")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("User")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Action")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("td", [
+      _c("span", { staticClass: "custom-checkbox" }, [
+        _c("input", {
+          attrs: { type: "checkbox", name: "options[]", value: "1" }
+        }),
+        _vm._v(" "),
+        _c("label")
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "a",
+      {
+        staticClass: "edit",
+        attrs: { href: "#editPostModal", "data-toggle": "modal" }
+      },
+      [
+        _c(
+          "i",
+          {
+            staticClass: "material-icons",
+            attrs: { "data-toggle": "tooltip", title: "Edit" }
+          },
+          [_vm._v("")]
+        )
       ]
     )
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "a",
+      {
+        staticClass: "delete",
+        attrs: { href: "#deletePostModal", "data-toggle": "modal" }
+      },
+      [
+        _c(
+          "i",
+          {
+            staticClass: "material-icons",
+            attrs: { "data-toggle": "tooltip", title: "Delete" }
+          },
+          [_vm._v("")]
+        )
+      ]
+    )
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c("h4", { staticClass: "modal-title" }, [_vm._v("Add Post")]),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "close",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-hidden": "true"
+          }
+        },
+        [_vm._v("×")]
+      )
+    ])
   },
   function() {
     var _vm = this
@@ -42146,7 +42356,7 @@ var staticRenderFns = [
                 ]),
                 _vm._v(" "),
                 _c("p", { staticClass: "text-warning" }, [
-                  _c("small", [_vm._v("Selected Posts : "), _c("strong")])
+                  _c("small", [_vm._v("Selected Posts :  "), _c("strong")])
                 ])
               ]),
               _vm._v(" "),
@@ -59260,7 +59470,7 @@ var index = {
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"axios","version":"0.21.4","description":"Promise based HTTP client for the browser and node.js","main":"index.js","scripts":{"test":"grunt test","start":"node ./sandbox/server.js","build":"NODE_ENV=production grunt build","preversion":"npm test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json","postversion":"git push && git push --tags","examples":"node ./examples/server.js","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","fix":"eslint --fix lib/**/*.js"},"repository":{"type":"git","url":"https://github.com/axios/axios.git"},"keywords":["xhr","http","ajax","promise","node"],"author":"Matt Zabriskie","license":"MIT","bugs":{"url":"https://github.com/axios/axios/issues"},"homepage":"https://axios-http.com","devDependencies":{"coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.3.0","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^23.0.0","grunt-karma":"^4.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^4.0.2","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^6.3.2","karma-chrome-launcher":"^3.1.0","karma-firefox-launcher":"^2.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^4.3.6","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.8","karma-webpack":"^4.0.2","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^8.2.1","sinon":"^4.5.0","terser-webpack-plugin":"^4.2.3","typescript":"^4.0.5","url-search-params":"^0.10.0","webpack":"^4.44.2","webpack-dev-server":"^3.11.0"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"jsdelivr":"dist/axios.min.js","unpkg":"dist/axios.min.js","typings":"./index.d.ts","dependencies":{"follow-redirects":"^1.14.0"},"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}]}');
+module.exports = JSON.parse('{"_args":[["axios@0.21.4","C:\\\\Users\\\\abdelrhman\\\\Desktop\\\\blog"]],"_development":true,"_from":"axios@0.21.4","_id":"axios@0.21.4","_inBundle":false,"_integrity":"sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==","_location":"/axios","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"axios@0.21.4","name":"axios","escapedName":"axios","rawSpec":"0.21.4","saveSpec":null,"fetchSpec":"0.21.4"},"_requiredBy":["#DEV:/"],"_resolved":"https://registry.npmjs.org/axios/-/axios-0.21.4.tgz","_spec":"0.21.4","_where":"C:\\\\Users\\\\abdelrhman\\\\Desktop\\\\blog","author":{"name":"Matt Zabriskie"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"bugs":{"url":"https://github.com/axios/axios/issues"},"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}],"dependencies":{"follow-redirects":"^1.14.0"},"description":"Promise based HTTP client for the browser and node.js","devDependencies":{"coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.3.0","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^23.0.0","grunt-karma":"^4.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^4.0.2","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^6.3.2","karma-chrome-launcher":"^3.1.0","karma-firefox-launcher":"^2.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^4.3.6","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.8","karma-webpack":"^4.0.2","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^8.2.1","sinon":"^4.5.0","terser-webpack-plugin":"^4.2.3","typescript":"^4.0.5","url-search-params":"^0.10.0","webpack":"^4.44.2","webpack-dev-server":"^3.11.0"},"homepage":"https://axios-http.com","jsdelivr":"dist/axios.min.js","keywords":["xhr","http","ajax","promise","node"],"license":"MIT","main":"index.js","name":"axios","repository":{"type":"git","url":"git+https://github.com/axios/axios.git"},"scripts":{"build":"NODE_ENV=production grunt build","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","examples":"node ./examples/server.js","fix":"eslint --fix lib/**/*.js","postversion":"git push && git push --tags","preversion":"npm test","start":"node ./sandbox/server.js","test":"grunt test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json"},"typings":"./index.d.ts","unpkg":"dist/axios.min.js","version":"0.21.4"}');
 
 /***/ })
 

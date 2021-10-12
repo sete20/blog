@@ -26,7 +26,7 @@ class PostsController extends Controller
      */
     public function index()
     {
-        dd(Auth::user());
+
         $categories = Category::paginate(10);
         $posts = Post::with('user')->paginate(10);
 

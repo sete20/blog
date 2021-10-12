@@ -28,6 +28,7 @@ Vue.component('category_posts', require('./components/category_posts.vue').defau
 Vue.component('pagination', require('laravel-vue-pagination'));
 Vue.component('login',require('./components/auth/login.vue').default);
 Vue.component('register',require('./components/auth/register.vue').default);
+Vue.component('EditPost', require('./components/dashboard/EditPost.vue').default);
 Vue.component('navbar', require('./components/layouts/nav.vue').default);
 Vue.component('dashboard', require('./components/dashboard/home.vue').default);
 /**

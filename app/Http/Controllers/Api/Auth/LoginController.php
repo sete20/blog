@@ -22,7 +22,6 @@ class LoginController extends Controller
         if (auth()->attempt($login_credentials)) {
             //generate the token for the user
             $user_login_token = auth()->user()->createToken('token');
-            $user = auth()->user();
             //now return this token on success login attempt
             return response()->json([
                 'token' => $user_login_token, 200,
