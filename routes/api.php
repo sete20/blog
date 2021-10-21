@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use App\Http\Controllers\Api\Admin\PostController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -16,7 +17,12 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Route::middleware('auth:api')->Route::group(['prefix' => 'profile/'], function () {
+route::get('/test', function () {
 
+
+    $us = User::first();
+    return $us->getProfileImage();
+});
 Route::apiResource('posts', App\Http\Controllers\Api\PostController::class);
 Route::get('category/posts/{category}', App\Http\Controllers\Api\CategoryPostsController::class);
 Route::get('search/posts/{q}', App\Http\Controllers\Api\SearchPostsController::class);

@@ -29,25 +29,61 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        // $this->validate($request, [
-        //     'images' => 'required|array',
-        //     'images.type' => 'image|mimes:jpeg,png',
-        //     'images.length' => 'min:1',
-        //     'title' => 'required|string',
-        //     'body' => 'required|string',
-        //     'categories' => 'required|distinct'
-        // ]);
-        // return $request->images;
-        // return    json_decode($request->images);
-        if ($request->has('images')) {
-            $filename = '';
+        $this->validate($request, [
+            'images' => 'required',
+            'images.type' => 'image|mimes:jpeg,png',
+            'title' => 'required|string',
+            'title' => 'required|min:3',
+            'body' => 'required|string',
+            'categories' => 'required|distinct|min:1'
+        ]);
+        $post = Post::create([
+            'title' => $request->title,
+            'body' => $request->body,
+            'slug' => $request->slug,
+            'title' => $request->title,
+            'user_id' => \Auth::user()->id
+        ]);
+        // dd($request->all());
+        // $categories = json_encode($request->categories);
+        $categories = json_encode($request->categories);
+        $categories = str_replace('"', "", $categories);
+        $categories = str_replace(',', "", $categories);
+        $categories = str_split($categories);
+        $count = count($categories);
+        for ($i = 0; $i < $count; $i++) {
+            $categories[$i] = (int)$categories[$i];
+        }
+        $post->categories()->attach($categories);
+        if ($request->hasFile('images')) {
             $files = $request->images;
             foreach ($files as $file) {
                 // here is your file object
-                $filename = time() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('img/posts'), $filename);
-                return "done";
+                dd($file->getClientOriginalName());
             }
+        } else {
+            return 0;
+        }
+        // dd($phpArray = json_decode($request->images[0], true));
+        // $name = $phpArray['name'];
+        // $coach = $phpArray['coach'];
+        // $coach_uuid = $phpArray['coach']['uuid'];
+        // $category = $phpArray['category'];
+        // $category_uuid = $phpArray['category']['uuid];
+        // if ($request->images) {
+        //     $files = $request->images;
+        //     foreach ($files as $file) {
+        //         // here is your file object
+        //         dd($file->getClientOriginalName());
+        //     }
+        //     // return $request->images;
+        //     return json_decode($request->images);
+        upload_images($request->images, $post);
+        //     // return $request->images;
+        // } else {
+        // }
+
+        if ($request->has('images')) {
         }
         // foreach ($files as $file) {
         //     // here is your file object

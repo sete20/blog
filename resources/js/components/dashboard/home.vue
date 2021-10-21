@@ -86,16 +86,31 @@
 					</div>
 					<div class="modal-body">
 						<div class="form-group">
+
+                    				<label>slug</label>
+							<input type="text" class="form-control" required v-model="slug">
+						</div>
+                                     <div class="text-danger" v-show="slugError">
+              ... slug is required and must be more than 3 chars
+              </div>
+						<div class="form-group">
+
 							<label>title</label>
 							<input type="text" class="form-control" required v-model="title">
 						</div>
+                                     <div class="text-danger" v-show="titleError">
+              ... title is required and must be more than 3 chars
+              </div>
 						<div class="form-group">
 							<label>body</label>
-							<textarea name=""  cols="30" class="form-control" rows="10" v-model="body"></textarea>
+							<textarea name="body"  cols="30" class="form-control" rows="10" v-model="body"></textarea>
 						</div>
+                                     <div class="text-danger" v-show="bodyError">
+              ... body is required and must be more than 3 chars
+              </div>
 						<div class="form-group">
 							<label>category</label>
-							<select name="" class="form-control" multiple="multiple" @change="pushCategories">
+							<select name="" class="form-control" ref="categories" multiple="multiple" v-model="categoriesPost" @change="pushCategories">
                                 <option value="0" disabled selected>choose category</option>
 
                                 <option v-for="category in categories" :key="category.id"  :value="category.id">
@@ -103,15 +118,21 @@
 								</option>
                             </select>
 						</div>
+                                     <div class="text-danger" v-show="categoriesError">
+              ... categories is required
+              </div>
 						<div class="form-group">
-							<label>images</label>
-														<input type="file" class="form-control" multiple="multiple" required @change="onImageChanged" >
-
+							<label>image</label>
+							<input type="file" name="images[]" accept="image/*" class="form-control imageData" multiple required  @change="onImageChanged" >
 						</div>
+                                     <div class="text-danger" v-show="imageError">
+              ... image is required or  invalid
+              </div>
 					</div>
 					<div class="modal-footer">
 						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-						<input type="submit" class="btn btn-success" value="Add" @click.prevent="addPost">
+						<input type="submit" class="btn btn-success" value="Add"
+                         @click.prevent="addPost">
 					</div>
 				</form>
 			</div>
@@ -171,71 +192,98 @@ export default{
 	},
     data() {
         return {
+            slug:'',
             images:[],
             categories:[],
             title:'',
             body:'',
             posts:{},
-            categoriesPost:[],
+            categoriesPost:''
         }
-
     },
-       methods: {
-           pushCategories(event){
-            //    console.log(event.target.options.selectedIndex);
-               this.categoriesPost.push(event.target.options.selectedIndex);
-    console.log(this.categoriesPost);
-           },
-            getPosts(page){
+    computed:{
+        // imageError(){
+        // this.images.length > 0;
+        // },
+        // categoriesError(){
+        // this.categoriesPost.length > 0;
+        // },
+        // titleError(){
+        //     this.title.length > 3;
+        // },
+        // bodyError(){
+        // this.body.length > 3;
+        // },
+        //     slugError(){
+        // this.slug.length > 3;
+        // },
+        // isValidForm(){
+        // return
+        // this.body.length > 3 &&
+        // this.title.length > 3 &&
+        // this.categoriesPost.length > 1 &&
+        // this.images.length > 1
+        // },
+    },
+    methods:
+     {
+        pushCategories(event){
+            // console.log(this.$refs.categories.val);
+            //     // this.categoriesPost.push(event.target.options.selectedIndex);
+                    console.log(this.categoriesPost);
+        },
+        getPosts(page){
                        axios.get('api/dashboard/posts/?page='+page).then(res=>{
                this.posts = res.data.posts;
                this.categories = res.data.categories;
                console.log(this.categories);
                console.log(this.posts);
-            }).then(err=>{
+        }).then(err=>{
                    console.log(err);
-
-            });
-            },
-
-            	onImageChanged(event){
-            //         this.images = [];
-            //  var files =event.target.files;
-                //   Array.from(event.target.files).forEach((file) => this.images(file));
-
-                console.log(this.images);
+        });
+        },
+        onImageChanged(event){
+            this.images=[];
+               console.log(this.images);
                     for (var i = 0; i < event.target.files.length; i++) {
-
+                        // this.images[i]  = event.target.files[i];
                     // get item
-                    this.images =event.target.files.item(i);
 
+                //    this.images[i]=event.target.files[i];
+                   this.images =event.target.files[0];
                 }
-            //     Object.entries(this.images);
-			console.log(this.images)
-            // this.image= [];
+                             console.log(this.images);
+		// },
+        // this.images = [];
+        //  for (let file of event.target.files) {
+        //             try {
+        //                 let reader = new FileReader();
+        //                 reader.readAsDataURL(file); // Not sure if this will work in this context.
 
-			//console.log(event.target.files[0])
-			// this.image  = event.target.files[0]
-
-            //   = event.target.files
-		},
+        //                 this.images.push(Object.entries(event.target.files[0]));
+        //             } catch {}
+        //         }
+        //         console.log(this.images.__ob__.value);
+            },
         addPost(){
-       		let config ={
-				headers :{"content-type" : 'multipart/form-data'}
-			}
-          		let formdata = new FormData();
-            formdata.append('title',this.title)
-            formdata.append('body',this.body)
-            formdata.append('images',this.images)
-            formdata.append('categories',this.categoriesPost);
-            axios.post('api/dashboard/posts',formdata,config).then(res=>{
-                  console.log(res);
-            }).then(err=>{
-
-            });
+            // document.querySelector('.imageData').val();
+         let config ={
+            headers :{"content-type" : 'multipart/form-data'}
+        }
+        let formdata = new FormData();
+        formdata.append('title',this.title)
+        formdata.append('body',this.body)
+        formdata.append('slug',this.slug)
+        formdata.append('images',this.images)
+        formdata.append('categories',this.categoriesPost);
+        axios.post('api/dashboard/posts',formdata,config).then(res=>{
+            console.log(res);
+        }).then(err=>{
+            console.log(err);
+        });
 
         },
-        },
+     },
 }
     $(document).ready(function() {
             // Activate tooltip

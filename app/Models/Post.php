@@ -42,4 +42,5 @@ class Post extends Model
     {
         return $this->morphMany(photo::class, 'photoable');
     }
+    
 }

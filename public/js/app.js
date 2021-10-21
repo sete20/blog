@@ -2892,6 +2892,27 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   mounted: function mounted() {
@@ -2902,18 +2923,42 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
+      slug: '',
       images: [],
       categories: [],
       title: '',
       body: '',
       posts: {},
-      categoriesPost: []
+      categoriesPost: ''
     };
+  },
+  computed: {// imageError(){
+    // this.images.length > 0;
+    // },
+    // categoriesError(){
+    // this.categoriesPost.length > 0;
+    // },
+    // titleError(){
+    //     this.title.length > 3;
+    // },
+    // bodyError(){
+    // this.body.length > 3;
+    // },
+    //     slugError(){
+    // this.slug.length > 3;
+    // },
+    // isValidForm(){
+    // return
+    // this.body.length > 3 &&
+    // this.title.length > 3 &&
+    // this.categoriesPost.length > 1 &&
+    // this.images.length > 1
+    // },
   },
   methods: {
     pushCategories: function pushCategories(event) {
-      //    console.log(event.target.options.selectedIndex);
-      this.categoriesPost.push(event.target.options.selectedIndex);
+      // console.log(this.$refs.categories.val);
+      //     // this.categoriesPost.push(event.target.options.selectedIndex);
       console.log(this.categoriesPost);
     },
     getPosts: function getPosts(page) {
@@ -2929,23 +2974,29 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     onImageChanged: function onImageChanged(event) {
-      //         this.images = [];
-      //  var files =event.target.files;
-      //   Array.from(event.target.files).forEach((file) => this.images(file));
+      this.images = [];
       console.log(this.images);
 
       for (var i = 0; i < event.target.files.length; i++) {
+        // this.images[i]  = event.target.files[i];
         // get item
-        this.images = event.target.files.item(i);
-      } //     Object.entries(this.images);
+        //    this.images[i]=event.target.files[i];
+        this.images = event.target.files[0];
+      }
 
-
-      console.log(this.images); // this.image= [];
-      //console.log(event.target.files[0])
-      // this.image  = event.target.files[0]
-      //   = event.target.files
+      console.log(this.images); // },
+      // this.images = [];
+      //  for (let file of event.target.files) {
+      //             try {
+      //                 let reader = new FileReader();
+      //                 reader.readAsDataURL(file); // Not sure if this will work in this context.
+      //                 this.images.push(Object.entries(event.target.files[0]));
+      //             } catch {}
+      //         }
+      //         console.log(this.images.__ob__.value);
     },
     addPost: function addPost() {
+      // document.querySelector('.imageData').val();
       var config = {
         headers: {
           "content-type": 'multipart/form-data'
@@ -2954,11 +3005,14 @@ __webpack_require__.r(__webpack_exports__);
       var formdata = new FormData();
       formdata.append('title', this.title);
       formdata.append('body', this.body);
+      formdata.append('slug', this.slug);
       formdata.append('images', this.images);
       formdata.append('categories', this.categoriesPost);
       axios.post('api/dashboard/posts', formdata, config).then(function (res) {
         console.log(res);
-      }).then(function (err) {});
+      }).then(function (err) {
+        console.log(err);
+      });
     }
   }
 });
@@ -42020,6 +42074,52 @@ var render = function() {
               _vm._v(" "),
               _c("div", { staticClass: "modal-body" }, [
                 _c("div", { staticClass: "form-group" }, [
+                  _c("label", [_vm._v("slug")]),
+                  _vm._v(" "),
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.slug,
+                        expression: "slug"
+                      }
+                    ],
+                    staticClass: "form-control",
+                    attrs: { type: "text", required: "" },
+                    domProps: { value: _vm.slug },
+                    on: {
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.slug = $event.target.value
+                      }
+                    }
+                  })
+                ]),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  {
+                    directives: [
+                      {
+                        name: "show",
+                        rawName: "v-show",
+                        value: _vm.slugError,
+                        expression: "slugError"
+                      }
+                    ],
+                    staticClass: "text-danger"
+                  },
+                  [
+                    _vm._v(
+                      "\n              ... slug is required and must be more than 3 chars\n              "
+                    )
+                  ]
+                ),
+                _vm._v(" "),
+                _c("div", { staticClass: "form-group" }, [
                   _c("label", [_vm._v("title")]),
                   _vm._v(" "),
                   _c("input", {
@@ -42045,6 +42145,26 @@ var render = function() {
                   })
                 ]),
                 _vm._v(" "),
+                _c(
+                  "div",
+                  {
+                    directives: [
+                      {
+                        name: "show",
+                        rawName: "v-show",
+                        value: _vm.titleError,
+                        expression: "titleError"
+                      }
+                    ],
+                    staticClass: "text-danger"
+                  },
+                  [
+                    _vm._v(
+                      "\n              ... title is required and must be more than 3 chars\n              "
+                    )
+                  ]
+                ),
+                _vm._v(" "),
                 _c("div", { staticClass: "form-group" }, [
                   _c("label", [_vm._v("body")]),
                   _vm._v(" "),
@@ -42058,7 +42178,7 @@ var render = function() {
                       }
                     ],
                     staticClass: "form-control",
-                    attrs: { name: "", cols: "30", rows: "10" },
+                    attrs: { name: "body", cols: "30", rows: "10" },
                     domProps: { value: _vm.body },
                     on: {
                       input: function($event) {
@@ -42071,15 +42191,61 @@ var render = function() {
                   })
                 ]),
                 _vm._v(" "),
+                _c(
+                  "div",
+                  {
+                    directives: [
+                      {
+                        name: "show",
+                        rawName: "v-show",
+                        value: _vm.bodyError,
+                        expression: "bodyError"
+                      }
+                    ],
+                    staticClass: "text-danger"
+                  },
+                  [
+                    _vm._v(
+                      "\n              ... body is required and must be more than 3 chars\n              "
+                    )
+                  ]
+                ),
+                _vm._v(" "),
                 _c("div", { staticClass: "form-group" }, [
                   _c("label", [_vm._v("category")]),
                   _vm._v(" "),
                   _c(
                     "select",
                     {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.categoriesPost,
+                          expression: "categoriesPost"
+                        }
+                      ],
+                      ref: "categories",
                       staticClass: "form-control",
                       attrs: { name: "", multiple: "multiple" },
-                      on: { change: _vm.pushCategories }
+                      on: {
+                        change: [
+                          function($event) {
+                            var $$selectedVal = Array.prototype.filter
+                              .call($event.target.options, function(o) {
+                                return o.selected
+                              })
+                              .map(function(o) {
+                                var val = "_value" in o ? o._value : o.value
+                                return val
+                              })
+                            _vm.categoriesPost = $event.target.multiple
+                              ? $$selectedVal
+                              : $$selectedVal[0]
+                          },
+                          _vm.pushCategories
+                        ]
+                      }
                     },
                     [
                       _c(
@@ -42109,15 +42275,61 @@ var render = function() {
                   )
                 ]),
                 _vm._v(" "),
+                _c(
+                  "div",
+                  {
+                    directives: [
+                      {
+                        name: "show",
+                        rawName: "v-show",
+                        value: _vm.categoriesError,
+                        expression: "categoriesError"
+                      }
+                    ],
+                    staticClass: "text-danger"
+                  },
+                  [
+                    _vm._v(
+                      "\n              ... categories is required\n              "
+                    )
+                  ]
+                ),
+                _vm._v(" "),
                 _c("div", { staticClass: "form-group" }, [
-                  _c("label", [_vm._v("images")]),
+                  _c("label", [_vm._v("image")]),
                   _vm._v(" "),
                   _c("input", {
-                    staticClass: "form-control",
-                    attrs: { type: "file", multiple: "multiple", required: "" },
+                    staticClass: "form-control imageData",
+                    attrs: {
+                      type: "file",
+                      name: "images[]",
+                      accept: "image/*",
+                      multiple: "",
+                      required: ""
+                    },
                     on: { change: _vm.onImageChanged }
                   })
-                ])
+                ]),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  {
+                    directives: [
+                      {
+                        name: "show",
+                        rawName: "v-show",
+                        value: _vm.imageError,
+                        expression: "imageError"
+                      }
+                    ],
+                    staticClass: "text-danger"
+                  },
+                  [
+                    _vm._v(
+                      "\n              ... image is required or  invalid\n              "
+                    )
+                  ]
+                )
               ]),
               _vm._v(" "),
               _c("div", { staticClass: "modal-footer" }, [
@@ -59470,7 +59682,7 @@ var index = {
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"_args":[["axios@0.21.4","C:\\\\Users\\\\abdelrhman\\\\Desktop\\\\blog"]],"_development":true,"_from":"axios@0.21.4","_id":"axios@0.21.4","_inBundle":false,"_integrity":"sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==","_location":"/axios","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"axios@0.21.4","name":"axios","escapedName":"axios","rawSpec":"0.21.4","saveSpec":null,"fetchSpec":"0.21.4"},"_requiredBy":["#DEV:/"],"_resolved":"https://registry.npmjs.org/axios/-/axios-0.21.4.tgz","_spec":"0.21.4","_where":"C:\\\\Users\\\\abdelrhman\\\\Desktop\\\\blog","author":{"name":"Matt Zabriskie"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"bugs":{"url":"https://github.com/axios/axios/issues"},"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}],"dependencies":{"follow-redirects":"^1.14.0"},"description":"Promise based HTTP client for the browser and node.js","devDependencies":{"coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.3.0","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^23.0.0","grunt-karma":"^4.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^4.0.2","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^6.3.2","karma-chrome-launcher":"^3.1.0","karma-firefox-launcher":"^2.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^4.3.6","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.8","karma-webpack":"^4.0.2","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^8.2.1","sinon":"^4.5.0","terser-webpack-plugin":"^4.2.3","typescript":"^4.0.5","url-search-params":"^0.10.0","webpack":"^4.44.2","webpack-dev-server":"^3.11.0"},"homepage":"https://axios-http.com","jsdelivr":"dist/axios.min.js","keywords":["xhr","http","ajax","promise","node"],"license":"MIT","main":"index.js","name":"axios","repository":{"type":"git","url":"git+https://github.com/axios/axios.git"},"scripts":{"build":"NODE_ENV=production grunt build","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","examples":"node ./examples/server.js","fix":"eslint --fix lib/**/*.js","postversion":"git push && git push --tags","preversion":"npm test","start":"node ./sandbox/server.js","test":"grunt test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json"},"typings":"./index.d.ts","unpkg":"dist/axios.min.js","version":"0.21.4"}');
+module.exports = JSON.parse('{"_args":[["axios@0.21.4","C:\\\\Users\\\\Administrator\\\\Desktop\\\\projects\\\\blog"]],"_development":true,"_from":"axios@0.21.4","_id":"axios@0.21.4","_inBundle":false,"_integrity":"sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==","_location":"/axios","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"axios@0.21.4","name":"axios","escapedName":"axios","rawSpec":"0.21.4","saveSpec":null,"fetchSpec":"0.21.4"},"_requiredBy":["#DEV:/"],"_resolved":"https://registry.npmjs.org/axios/-/axios-0.21.4.tgz","_spec":"0.21.4","_where":"C:\\\\Users\\\\Administrator\\\\Desktop\\\\projects\\\\blog","author":{"name":"Matt Zabriskie"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"bugs":{"url":"https://github.com/axios/axios/issues"},"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}],"dependencies":{"follow-redirects":"^1.14.0"},"description":"Promise based HTTP client for the browser and node.js","devDependencies":{"coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.3.0","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^23.0.0","grunt-karma":"^4.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^4.0.2","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^6.3.2","karma-chrome-launcher":"^3.1.0","karma-firefox-launcher":"^2.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^4.3.6","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.8","karma-webpack":"^4.0.2","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^8.2.1","sinon":"^4.5.0","terser-webpack-plugin":"^4.2.3","typescript":"^4.0.5","url-search-params":"^0.10.0","webpack":"^4.44.2","webpack-dev-server":"^3.11.0"},"homepage":"https://axios-http.com","jsdelivr":"dist/axios.min.js","keywords":["xhr","http","ajax","promise","node"],"license":"MIT","main":"index.js","name":"axios","repository":{"type":"git","url":"git+https://github.com/axios/axios.git"},"scripts":{"build":"NODE_ENV=production grunt build","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","examples":"node ./examples/server.js","fix":"eslint --fix lib/**/*.js","postversion":"git push && git push --tags","preversion":"npm test","start":"node ./sandbox/server.js","test":"grunt test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json"},"typings":"./index.d.ts","unpkg":"dist/axios.min.js","version":"0.21.4"}');
 
 /***/ })
 

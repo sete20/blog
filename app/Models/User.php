@@ -48,4 +48,12 @@ class User extends Authenticatable
     {
         return $this->morphOne(Photo::class, 'photoable');
     }
+    public function getProfileImage()
+    {
+        if ($this->profile_image()->exists()) {
+            return $this->profile_image()->latest()->first()->path;
+        } else {
+            return null;
+        }
+    }
 }

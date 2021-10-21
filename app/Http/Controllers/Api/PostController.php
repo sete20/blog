@@ -70,10 +70,10 @@ class PostController extends Controller
                             'body' => $comment->body,
                             'user' => $comment->user,
                             'added_at' => $comment->created_at->diffForHumans(),
-                            'profile_img' => $comment->user->profile_image->latest()->first()->path,
+                            'profile_img' => $comment->user->getProfileImage(),
                             'replays' => $comment->replays->map(function ($replay) {
                                 return [
-                                    'profile_img' => $replay->user->profile_image->latest()->first()->path,
+                                    'profile_img' => $replay->user->getProfileImage(),
                                     'user' => $replay->user,
                                     'email' => $replay->user->email,
                                     'body' => $replay->body,
@@ -100,7 +100,7 @@ class PostController extends Controller
 
             ]);
         }
-        dd($newComments);
+   
     }
 
     /**
