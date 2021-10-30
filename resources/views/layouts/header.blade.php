@@ -28,5 +28,28 @@ href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" 
   <!-- Custom styles for this template -->
   <link href="{{asset('assets/css/added_style.css')}}" rel="stylesheet">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+      <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+        <script>
+               Pusher.logToConsole = true;
+
+    var pusher = new Pusher('5cee322a8e7aa42edc17', {
+      cluster: 'mt1'
+    });
+        </script>
+
+      {{--  <script>
+
+    // Enable pusher logging - don't include this in production
+    Pusher.logToConsole = true;
+
+    var pusher = new Pusher('e01c5d0b31848dc854d0', {
+      cluster: 'mt1'
+    });
+
+    var channel = pusher.subscribe('my-channel');
+    channel.bind('my-event', function(data) {
+      alert(JSON.stringify(data));
+    });
+  </script>  --}}
 </head>
 <body>

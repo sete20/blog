@@ -28,9 +28,10 @@ Vue.component('category_posts', require('./components/category_posts.vue').defau
 Vue.component('pagination', require('laravel-vue-pagination'));
 Vue.component('login',require('./components/auth/login.vue').default);
 Vue.component('register',require('./components/auth/register.vue').default);
-Vue.component('EditPost', require('./components/dashboard/EditPost.vue').default);
 Vue.component('navbar', require('./components/layouts/nav.vue').default);
 Vue.component('dashboard', require('./components/dashboard/home.vue').default);
+Vue.component('editPost', require('./components/dashboard/editPost.vue').default);
+
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
@@ -42,7 +43,9 @@ import router from './routes/router';
 const store = new Vuex.Store({
     state: {
         userToken: null,
-        Admin:null,
+        Admin: null,
+        EditPost:{},
+        user:null,
     },
     getters:{
         isLogged(state){
@@ -50,6 +53,9 @@ const store = new Vuex.Store({
         },
         isAdmin(state) {
                 return state.Admin;
+        },
+        postToEdit(state) {
+            return state.EditPost;
         }
 
     },
@@ -65,6 +71,10 @@ const store = new Vuex.Store({
             state.userToken = null;
             localStorage.removeItem('userToken');
         },
+        setUser(satet) {
+            state.user = user;
+            Echo.connector.pusher.config.auth.headers.Authorization = `Barer ${state.userToken}`;
+        },
         setAdmin(state) {
              axios.get('api/isAdmin').then(res=>{
                  console.log(res);
@@ -74,7 +84,10 @@ const store = new Vuex.Store({
                 }).then(err=>{
                    console.log(err);
                });
-        }
+        },
+        EditPost(state,post) {
+            state.EditPost = post;
+        },
     },
     actions:{
         registerUser({ commit,getters }, payload) {

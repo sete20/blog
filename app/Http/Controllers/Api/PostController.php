@@ -14,9 +14,6 @@ class PostController extends Controller
         $categories = Category::whereHas('posts')->paginate(10);
         foreach ($posts as $post) {
             $post->setAttribute('added_at', $post->created_at->diffForHumans());
-            if ($post->photos->isNotEmpty()) {
-                $post->setAttribute('poster', $post->photos->path->first());
-            }
             $post->categories->first();
             $post->setAttribute('comments_count', $post->comments->count());
         }
@@ -58,7 +55,7 @@ class PostController extends Controller
                     'slug' => $post->slug,
                     'body' => $post->body,
                     'added_at' => $post->created_at->diffForHumans(),
-                    'posters' => $post->photos,
+                    'poster' => $post->poster,
                     'user' => $post->user->name,
                     'title' => $post->title,
                     'comments_count' => $post->comments->count(),
@@ -100,7 +97,6 @@ class PostController extends Controller
 
             ]);
         }
-   
     }
 
     /**

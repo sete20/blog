@@ -48,7 +48,7 @@
 
         <!-- Blog Post -->
                    <div class="media simple-post" v-for="post in posts.data" :key="post.id">
-          <img class="mr-3" v-if="post.poster" :src="fdfd" alt="Generic placeholder image">
+          <img class="mr-3" v-if="post.poster" :src="'img/posts/'+post.poster" alt="Generic placeholder image">
           <img class="mr-3" v-else src="img/posts/defulat.png" alt="Generic placeholder image">
 
 

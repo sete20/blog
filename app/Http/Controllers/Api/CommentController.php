@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+
+use App\Events\NewComment;
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
 use Illuminate\Http\Request;
@@ -29,13 +31,15 @@ class CommentController extends Controller
     {
 
         $request->merge(['user_id' => Auth::id()]);
+        // dd($request->all());
         $comment = Comment::create($request->all());
+        // dd($comment->post);
+        broadcast(new NewComment($comment->user, $comment));
         return response()->json([
             'id' => $comment->id,
             'body' => $comment->body,
             'user' => $comment->user,
             'added_at' => $comment->created_at->diffForHumans(),
-
         ]);
     }
 

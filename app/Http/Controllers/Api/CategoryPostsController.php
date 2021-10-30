@@ -17,7 +17,7 @@ class CategoryPostsController extends Controller
     public function __invoke(Category $category)
     {
         return response()->json(
-            ['posts' => $category->posts->load('user')->paginate(10),]
+            ['posts' => $category->posts()->paginate(10)->load('user'),]
         );
     }
 }

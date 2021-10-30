@@ -28,9 +28,7 @@
         <hr>
 
         <!-- Preview Image -->
-        <div v-if="post.posters.length  != 0">
-               <img class="mr-3" v-for="poster in post.posters" :key="poster.id" :src="poster.path" alt="Generic placeholder image">
-        </div>
+               <img class="mr-3" v-if="post.poster" :src="'img/posts/'+post.poster" alt="Generic placeholder image">
           <img class="m-10" v-else src="img/posts/defulat.png" alt="Generic placeholder image">
 
         <hr>
@@ -45,9 +43,9 @@
           <div class="card-body">
             <form>
               <div class="form-group">
-                <textarea v-model="body" class="form-control" rows="2"></textarea>
+                <textarea id="textComment" v-model="body" class="form-control" rows="2"></textarea>
               </div>
-              <button type="submit"  @click.prevent="createComment" class="btn btn-primary">Submit</button>
+              <button type="submit" :disabled="!this.commentValidation"  @click.prevent="createComment"  class="btn btn-primary">Submit</button>
             </form>
           </div>
         </div>
@@ -57,7 +55,7 @@
                    <img class="m-10"  src="http://placehold.it/50x50" alt="Generic placeholder image">
           <div class="media-body">
             <h5 class="mt-0">
-            {{ comment.user.first_name }}
+            {{ comment.user.name }}
             </h5>
             <strong>{{comment.body}}</strong>
 
@@ -68,7 +66,7 @@
             <div class="mt-4 media" v-for="replay in comment.replays" :key="replay.id">
               <img class="mr-3 d-flex rounded-circle" id="personal_image" src="http://placehold.it/50x50" alt="">
               <div class="media-body">
-                <h5 class="mt-0">{{ replay.user.first_name }}</h5>
+                <h5 class="mt-0">{{ replay.user.name }}</h5>
                 {{ replay.body }}
               </div>
             </div>
@@ -114,11 +112,13 @@ import Categories from './Categories.vue';
 
     export default {
   components: { Categories },
+
         mounted() {
             console.log('in details');
             this.getPost();
         },
-        created() {
+
+    created() {
           this.updateToken();
         },
         data(){
@@ -130,6 +130,7 @@ import Categories from './Categories.vue';
                 comments:[],
                 }
         },
+
         methods: {
             getPost(){
                axios.get('api/posts/'+this.$route.params.slug).
@@ -138,6 +139,7 @@ import Categories from './Categories.vue';
                    this.categories=res.data.categories;
                     this.post_id= this.post.id;
                     this.comments = this.post.comments;
+                    this.initializeListener();
                     })
                 .then(err=>{
                 console.log(err);
@@ -148,6 +150,7 @@ import Categories from './Categories.vue';
                 axios.post('api/comment',{body,post_id})
                 .then(res=>{
                     // console.log(res.data.comment);
+        $('.textComment').val('')
                   this.comments.unshift(res.data);
 
                 }).catch(err=>{
@@ -158,12 +161,24 @@ import Categories from './Categories.vue';
           let token = JSON.parse(localStorage.getItem('userToken'));
         //   لمنادات الميتوشن وعملها commit
           this.$store.commit('setUserToken',token);
-        }
+        },
+         initializeListener(){
+       Echo.join(`private-newComment.${this.post_id}`)
+      .listen('NewComment', (e) => {
+          console.log(e);
+          this.comments.unshift(e.comment);
+                // console.log(e);
+                console.log("new event recev");
+            });
+        },
         },
         computed:{
             isLogged(){
                 return this.$store.getters.isLogged;
-            }
+            },
+                commentValidation(){
+            return this.body.length >= 3
+        }
         }
 
     }

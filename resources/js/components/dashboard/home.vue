@@ -10,9 +10,9 @@
 					<div class="col-sm-6">
 						<a href="#addPostModal" class="btn btn-success" data-toggle="modal"><i class="material-icons">&#xE147;</i> <span>Add New Post</span></a>
 
-						<a href="#deletePostModal"
+						<a href="#deletePostModal" v-if="selectedPosts.length"
 						class="btn btn-danger" data-toggle="modal"><i class="material-icons">&#xE15C;</i> <span>Delete</span></a>
-						<a href="#deletePostModalnopost"
+						<a href="#deletePostModalnopost"  v-if="!selectedPosts.length"
 						class="btn btn-danger" data-toggle="modal"><i class="material-icons">&#xE15C;</i> <span>Delete</span></a>
 					</div>
                 </div>
@@ -23,6 +23,7 @@
 						<th>
 							<span class="custom-checkbox">
 								<input type="checkbox"
+                                 @click="selectAll"
 								 id="selectAll">
 								<label for="selectAll"></label>
 							</span>
@@ -38,10 +39,10 @@
                 <tbody v-if="posts.data">
                     <tr v-for="(post,index) in posts.data" :key="index">
 						<td>
-							<span class="custom-checkbox">
-								<input type="checkbox"
+											<span class="custom-checkbox">
+								<input type="checkbox" :id="'checkbox1'+index" @click.stop="selectPost(post,$event)"
 								name="options[]" value="1">
-								<label ></label>
+								<label :for="'checkbox1'+index"></label>
 							</span>
 						</td>
                         <td>{{ post.title }}</td>
@@ -52,13 +53,13 @@
                             </span>
                         </td>
                         <td>
-                            <img  v-if="post.poster" :src="fdfd" style="width:100px;height:60px;border:1px solid #e7e7e7" alt="">
+                            <img  v-if="post.poster" :src="'img/posts/'+post.poster" style="width:100px;height:60px;border:1px solid #e7e7e7" alt="">
                             <img class="mr-3" v-else src="img/posts/defulat.png" alt="Generic placeholder image">
 
                         </td>
                         <td>{{post.user.first_name +' '+ post.user.last_name}}</td>
                    <td>
-                            <a href="#editPostModal" class="edit"
+                <a href="#editPostModal" class="edit" @click="editPost(post,$event)"
 							 data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
                             <a href="#deletePostModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>
                             <router-link  :to="'/post/'+post.slug" class="" target="_blank"><i class="material-icons" data-toggle="tooltip" title="Delete">&#128065;</i></router-link>
@@ -71,7 +72,6 @@
 			<div class="clearfix">
                          <div class="hint-text">Showing <b>10</b> out of <b>{{posts.total}}</b> entries</div>
                 <pagination :data="posts" @pagination-change-page="getPosts"></pagination>
-
             </div>
         </div>
     </div>
@@ -132,13 +132,14 @@
 					<div class="modal-footer">
 						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
 						<input type="submit" class="btn btn-success" value="Add"
+                        :disabled="!isValidForm"
                          @click.prevent="addPost">
 					</div>
 				</form>
 			</div>
 		</div>
 	</div>
-   <EditPost></EditPost>
+   <editPost></editPost>
 	<!-- Delete Modal HTML -->
 	<div id="deletePostModal" class="modal fade">
 		<div class="modal-dialog">
@@ -151,11 +152,11 @@
 					<div class="modal-body">
 						<p>Are you sure you want to delete these Records?</p>
 						<p class="text-warning"><small>This action cannot be undone.</small></p>
-						<p class="text-warning"><small>Selected Posts :  <strong></strong></small></p>
+						<p class="text-warning"><small>Selected Posts : <strong>{{selectedPosts.length}}</strong></small></p>
 					</div>
 					<div class="modal-footer">
 						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-						<input type="submit" class="btn btn-danger"
+						<input type="submit" class="btn btn-danger" @click.prevent="deletePosts"
 						value="Delete">
 					</div>
 				</form>
@@ -182,48 +183,45 @@
 </div>
 </template>
 <script>
-import EditPost from './EditPost.vue'
+import editPost from './editPost.vue'
 export default{
     mounted() {
         this.getPosts();
     },
-    	components:{
-          EditPost
-	},
+    	    components:{
+        editPost
+    },
     data() {
         return {
             slug:'',
             images:[],
-            categories:[],
+            categories:'',
             title:'',
             body:'',
             posts:{},
-            categoriesPost:''
+            categoriesPost:'',
+            selectedPosts:[],
         }
     },
     computed:{
-        // imageError(){
-        // this.images.length > 0;
-        // },
-        // categoriesError(){
-        // this.categoriesPost.length > 0;
-        // },
-        // titleError(){
-        //     this.title.length > 3;
-        // },
-        // bodyError(){
-        // this.body.length > 3;
-        // },
-        //     slugError(){
-        // this.slug.length > 3;
-        // },
-        // isValidForm(){
-        // return
-        // this.body.length > 3 &&
-        // this.title.length > 3 &&
-        // this.categoriesPost.length > 1 &&
-        // this.images.length > 1
-        // },
+        imageError(){
+      return  this.images.length < 1;
+        },
+        categoriesError(){
+      return  this.categoriesPost.length < 1;
+        },
+        titleError(){
+       return     this.title.length < 3;
+        },
+        bodyError(){
+      return  this.body.length < 3;
+        },
+            slugError(){
+        return  this.slug.length < 3;
+        },
+        isValidForm(){
+        return  this.body.length >= 3&& this.title.length >=3&&this.slug.length >=3 ;
+        },
     },
     methods:
      {
@@ -278,12 +276,59 @@ export default{
         formdata.append('categories',this.categoriesPost);
         axios.post('api/dashboard/posts',formdata,config).then(res=>{
             console.log(res);
+            this.title=null;
+            this.body=null;
+            this.slug=null;
+            this.images=null;
+            this.categoriesPost=null;
+            $('#addPostModal').modal('hide');
+				$('.modal-backdrop').css('display','none');
         }).then(err=>{
             console.log(err);
         });
 
         },
+        editPost(post){
+            this.$store.commit('EditPost',post);
+        },
+        		selectPost(post,event){
+			let index = this.selectedPosts.indexOf(post.id);
+			if(index > -1){
+				this.selectedPosts.splice(index,1)
+				event.target.checked = false //uncheck
+			}else{
+				 this.selectedPosts.push(post.id);
+				 event.target.checked = true;
+			}
+		},
+        selectAll(event){
+              if( event.target.checked ){
+				  $('input[type="checkbox"]').prop('checked',true)
+				  this.posts.data.forEach(p =>{
+					  this.selectedPosts.push(p.id)
+				  })
+			  }else{
+				   $('input[type="checkbox"]').prop('checked',false)
+				   this.selectedPosts = []
+			  }
+		},
+        	deletePosts(){
+			 axios.post('/api/dashboard/posts/delete/',{posts_ids: this.selectedPosts})
+			 .then(res => {
+				 console.log(res.data)
+                 this.selectedPosts=[];
+				 $('#deletePostModal').modal('hide');
+				$('.modal-backdrop').css('display','none');
+				this.getPosts();
+				$('input[type="checkbox"]').prop('checked',false)
+
+			 })
+			 .catch(err =>{
+				 console.log(err)
+			 });
+		}
      },
+
 }
     $(document).ready(function() {
             // Activate tooltip

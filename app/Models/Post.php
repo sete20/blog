@@ -9,6 +9,7 @@ class Post extends Model
 {
     use HasFactory;
     protected $guarded = [];
+    protected $appends = ['poster'];
     public function scopeSearchPosts($query, $q)
     {
         return $query->where('body', $q . '%')
@@ -42,5 +43,13 @@ class Post extends Model
     {
         return $this->morphMany(photo::class, 'photoable');
     }
-    
+
+    public function getPosterAttribute()
+    {
+        if ($this->photos()->exists()) {
+            return $this->photos()->latest()->first()->path;
+        } else {
+            return null;
+        }
+    }
 }

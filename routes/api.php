@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use App\Http\Controllers\Api\Admin\PostController;
+use App\Http\Controllers\Api\PostController as ApiPostController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -37,8 +38,11 @@ Route::group(['prefix' => '/', 'middleware' => 'auth:api', 'namespace' => 'App\H
         } else {
             return 0;
         }
-    });
+    })->middleware('auth:api');
 });
 route::group(['prefix' => 'dashboard', 'middleware' => 'auth:api', 'namespace' => 'App\Http\Controllers\Api\Admin', 'as' => 'dashboard.'], function () {
-    route::apiResource('posts', \PostController::class);
+    route::apiResource('posts', \PostController::class)->except('update', 'destroy');
+    route::post('posts/update/{post}', 'PostController@update');
+    route::post('posts/delete/', 'PostController@destroy');
 });
+route::get('testing', \App\Http\Controllers\testApi::class);
